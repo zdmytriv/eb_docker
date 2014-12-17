@@ -1,0 +1,31 @@
+/opt/elasticbeanstalk/lib/ruby/bin/ruby extconf.rb 
+>>>>> Creating Makefile for ruby version 2.1.2 on x86_64-linux <<<<<
+creating Makefile
+
+make "DESTDIR=" clean
+
+make "DESTDIR="
+compiling dump.c
+compiling fast.c
+compiling parse.c
+compiling val_stack.c
+compiling sparse.c
+compiling circarray.c
+compiling cache8.c
+compiling reader.c
+compiling scp.c
+compiling oj.c
+compiling hash.c
+compiling err.c
+compiling compat.c
+compiling hash_test.c
+compiling resolve.c
+compiling saj.c
+compiling odd.c
+compiling strict.c
+compiling object.c
+linking shared-object oj.so
+
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 oj.so ./.gem.20141002-12222-15y05lw
+installing default oj libraries

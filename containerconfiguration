@@ -1,0 +1,361 @@
+{
+  "commands": {
+    "CMD-PublishLogs": {
+      "stages": [
+        {
+          "name": "PublishLogs",
+          "actions": [
+            {
+              "type": "sh",
+              "name": "PublishLogs",
+              "value": "publishLogs.py --de-dupe --conf-path '/opt/elasticbeanstalk/tasks/publishlogs.d/*' --location-prefix 'resources/environments/logs/publish/' --num-concurrent 2"
+            }
+          ]
+        }
+      ]
+    },
+    "CMD-ConfigDeploy": {
+      "stages": [
+        {
+          "name": "ConfigDeployStage0",
+          "actions": [
+            {
+              "type": "infra",
+              "name": "InfraWriteConfig",
+              "value": "writeruntimeconfig"
+            },
+            {
+              "type": "hook",
+              "name": "ConfigDeployPreHook",
+              "value": "configdeploy/pre"
+            }
+          ]
+        },
+        {
+          "name": "ConfigDeployStage1",
+          "actions": [
+            {
+              "type": "hook",
+              "name": "ConfigDeployEnactHook",
+              "value": "configdeploy/enact"
+            },
+            {
+              "type": "hook",
+              "name": "ConfigDeployPostHook",
+              "value": "configdeploy/post"
+            }
+          ]
+        }
+      ]
+    },
+    "CMD-SystemTailLogs": {
+      "stages": [
+        {
+          "name": "SystemTailLogs",
+          "actions": [
+            {
+              "type": "sh",
+              "name": "SystemTailLogs",
+              "value": "tailLogs.py --concatenate --conf-path '/opt/elasticbeanstalk/tasks/systemtaillogs.d/*' --location-prefix 'resources/environments/logs/systemtail/'"
+            }
+          ]
+        }
+      ]
+    },
+    "CMD-RestartAppServer": {
+      "stages": [
+        {
+          "name": "RestartAppServerStage0",
+          "actions": [
+            {
+              "type": "infra",
+              "name": "InfraWriteConfig",
+              "value": "writeruntimeconfig"
+            },
+            {
+              "type": "hook",
+              "name": "RestartAppServerPreHook",
+              "value": "restartappserver/pre"
+            }
+          ]
+        },
+        {
+          "name": "RestartAppServerStage1",
+          "actions": [
+            {
+              "type": "hook",
+              "name": "RestartAppServerEnactHook",
+              "value": "restartappserver/enact"
+            },
+            {
+              "type": "hook",
+              "name": "RestartAppServerPostHook",
+              "value": "restartappserver/post"
+            }
+          ]
+        }
+      ]
+    },
+    "CMD-Startup": {
+      "stages": [
+        {
+          "leader_election": "true",
+          "name": "StartupStage0",
+          "actions": [
+            {
+              "type": "infra",
+              "name": "EbExtensionPreBuild",
+              "value": "embeddedprebuild"
+            },
+            {
+              "type": "hook",
+              "name": "AppDeployPreHook",
+              "value": "appdeploy/pre"
+            },
+            {
+              "type": "infra",
+              "name": "EbExtensionPostBuild",
+              "value": "embeddedpostbuild"
+            },
+            {
+              "type": "infra",
+              "name": "InfraCleanEbExtension",
+              "value": "cleanebextensions"
+            }
+          ]
+        },
+        {
+          "name": "StartupStage1",
+          "actions": [
+            {
+              "type": "hook",
+              "name": "AppDeployEnactHook",
+              "value": "appdeploy/enact"
+            },
+            {
+              "type": "hook",
+              "name": "AppDeployPostHook",
+              "value": "appdeploy/post"
+            },
+            {
+              "type": "hook",
+              "name": "PostInitHook",
+              "value": "postinit"
+            }
+          ]
+        }
+      ]
+    },
+    "CMD-TailLogs": {
+      "stages": [
+        {
+          "name": "TailLogsDockerPS",
+          "actions": [
+            {
+              "type": "sh",
+              "name": "DockerPS",
+              "value": "echo \"'docker ps' ran at `date`: \" >> /var/log/docker-ps.log && docker ps >> /var/log/docker-ps.log"
+            }
+          ]
+        },
+        {
+          "name": "TailLogs",
+          "actions": [
+            {
+              "type": "sh",
+              "name": "TailLogs",
+              "value": "tailLogs.py --concatenate --conf-path '/opt/elasticbeanstalk/tasks/taillogs.d/*' --location-prefix 'resources/environments/logs/tail/'"
+            }
+          ]
+        }
+      ]
+    },
+    "CMD-AppDeploy": {
+      "stages": [
+        {
+          "leader_election": "true",
+          "name": "AppDeployStage0",
+          "actions": [
+            {
+              "type": "infra",
+              "name": "InfraWriteConfig",
+              "value": "writeruntimeconfig"
+            },
+            {
+              "type": "infra",
+              "name": "InfraWriteApp1",
+              "value": "writeapplication1"
+            },
+            {
+              "type": "infra",
+              "name": "InfraWriteApp2",
+              "value": "writeapplication2"
+            },
+            {
+              "type": "infra",
+              "name": "EbExtensionPreBuild",
+              "value": "embeddedprebuild"
+            },
+            {
+              "type": "hook",
+              "name": "AppDeployPreHook",
+              "value": "appdeploy/pre"
+            },
+            {
+              "type": "infra",
+              "name": "EbExtensionPostBuild",
+              "value": "embeddedpostbuild"
+            },
+            {
+              "type": "infra",
+              "name": "InfraCleanEbextension",
+              "value": "cleanebextensions"
+            }
+          ]
+        },
+        {
+          "name": "AppDeployStage1",
+          "actions": [
+            {
+              "type": "hook",
+              "name": "AppDeployEnactHook",
+              "value": "appdeploy/enact"
+            },
+            {
+              "type": "hook",
+              "name": "AppDeployPostHook",
+              "value": "appdeploy/post"
+            }
+          ]
+        }
+      ]
+    },
+    "CMD-PreInit": {
+      "stages": [
+        {
+          "name": "PreInitStage0",
+          "actions": [
+            {
+              "type": "infra",
+              "name": "InfraWriteConfig",
+              "value": "writeruntimeconfig"
+            },
+            {
+              "type": "infra",
+              "name": "InfraWriteApp1",
+              "value": "writeapplication1"
+            },
+            {
+              "type": "infra",
+              "name": "InfraWriteApp2",
+              "value": "writeapplication2"
+            },
+            {
+              "type": "hook",
+              "name": "PreInitHook",
+              "value": "preinit"
+            }
+          ]
+        }
+      ]
+    },
+    "CMD-BundleLogs": {
+      "stages": [
+        {
+          "name": "BundleLogs",
+          "actions": [
+            {
+              "type": "sh",
+              "name": "BundleLogs",
+              "value": "bundleLogs.py --conf-path '/opt/elasticbeanstalk/tasks/bundlelogs.d/*' --location-prefix 'resources/environments/logs/bundle/'"
+            }
+          ]
+        }
+      ]
+    },
+    "CMD-SelfStartup": {
+      "stages": [
+        {
+          "leader_election": "false",
+          "name": "StartupStage0",
+          "actions": [
+            {
+              "type": "infra",
+              "name": "EbExtensionPreBuild",
+              "value": "embeddedprebuild"
+            },
+            {
+              "type": "hook",
+              "name": "AppDeployPreHook",
+              "value": "appdeploy/pre"
+            },
+            {
+              "type": "infra",
+              "name": "EbExtensionPostBuild",
+              "value": "embeddedpostbuild"
+            },
+            {
+              "type": "infra",
+              "name": "InfraCleanEbextension",
+              "value": "cleanebextensions"
+            }
+          ]
+        },
+        {
+          "name": "StartupStage1",
+          "actions": [
+            {
+              "type": "hook",
+              "name": "AppDeployEnactHook",
+              "value": "appdeploy/enact"
+            },
+            {
+              "type": "hook",
+              "name": "AppDeployPostHook",
+              "value": "appdeploy/post"
+            },
+            {
+              "type": "hook",
+              "name": "PostInitHook",
+              "value": "postinit"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "optionsettings": {
+    "aws:elasticbeanstalk:application:environment": [
+      "AWS_ACCESS_KEY_ID=",
+      "AWS_SECRET_KEY=",
+      "PARAM1=",
+      "PARAM2=",
+      "PARAM3=",
+      "PARAM4=",
+      "PARAM5="
+    ],
+    "aws:elasticbeanstalk:hostmanager": {
+      "LogPublicationControl": "false"
+    }
+  },
+  "container": {
+    "instance_port": "80",
+    "app_staging_file": "/etc/elasticbeanstalk/.aws_beanstalk.staging-container-id",
+    "proxy_server": "nginx",
+    "support_files_dir": "/opt/elasticbeanstalk/containerfiles/support",
+    "port_file": "/etc/elasticbeanstalk/.aws_beanstalk.container-port",
+    "host_log_dir": "/var/log/eb-docker/containers/eb-current-app",
+    "docker_events_log": "/var/log/docker-events.log",
+    "source_bundle": "/opt/elasticbeanstalk/deploy/appsource/source_bundle",
+    "staging_image": "aws_beanstalk/staging-app",
+    "app_deploy_dir": "/var/app/current",
+    "deploy_image": "aws_beanstalk/current-app",
+    "app_deploy_file": "/etc/elasticbeanstalk/.aws_beanstalk.current-container-id",
+    "docker_ps_log": "/var/log/docker-ps.log"
+  },
+  "system": {
+    "LogPublicationControl": "false",
+    "AWSEBAgentId": "",
+    "AWSEBReferrerId": ""
+  }
+}

@@ -1,0 +1,12 @@
+#!/bin/env ruby
+
+require 'json'
+
+env_vars = JSON.parse(`/opt/elasticbeanstalk/bin/get-config environment`)
+    
+str = ''
+env_vars.each do |key, value|
+    str << "#{key}=#{value}\n"
+end
+
+print str
